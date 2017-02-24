@@ -5,7 +5,13 @@ const
   config = require('config'),
   express = require('express'),
   morgan = require('morgan'),
+  request = require('request-promise'),
+  logger = require('./logger.js').getLogger('[app]'),
   Bot = require('messenger-bot');
+
+const MSG = {
+  GETSTARTED : 'GETSTARTED'
+};
 
 
 class App {
@@ -30,43 +36,114 @@ class App {
       config.get('serverURL');
   }
 
-  createBot() {
-    let bot = new Bot({
-      token: this.PAGE_ACCESS_TOKEN,
-      verify: this.VALIDATION_TOKEN,
-      app_secret: this.APP_SECRET
-    });
-
-    bot.on('error', (err) => { this.handleBotErr(err) });
-    bot.on('message', (payload, reply) => { this.handleBotMessage(payload, reply); });
-
-    return bot;
+  botError(err) {
+    logger.error(err);
   }
 
-  handleBotErr(err) {
-    console.log(err);
+  botMessage(event, reply, actions) {
+
+    let senderID = event.sender.id;
+    let recipientID = event.recipient.id;
+    let timeOfMessage = event.timestamp;
+    let message = event.message;
+
+    logger.debug(`Received message from user:${senderID} with message:${JSON.stringify(message)} at time:${timeOfMessage}`);
+
+    let msg = {text: '<Echo>' + message.text};
+
+    actions.setTyping(true);
+    reply(msg, (err)=> {
+      actions.setTyping(false);
+      if (err) throw err;
+    });
+
   }
 
-  handleBotMessage(payload, reply) {
-    let text = payload.message.text;
-    this.bot.getProfile(payload.sender.id, (err, profile) => {
-      if (err) throw err
+  botPostback(event, reply, actions) {
+    let senderID = event.sender.id;
+    let recipientID = event.recipient.id;
+    let timeOfPostback = event.timestamp;
+    // The 'payload' param is a developer-defined field which is set in a postback
+    // button for Structured Messages.
+    let payload = event.postback.payload;
 
-      reply({ text }, (err) => {
-        if (err) throw err
+    logger.debug(`Received postback for user:${senderID} with payload:${payload} at time:${timeOfPostback}`);
 
-        console.log(`Echoed back to ${profile.first_name} ${profile.last_name}: ${text}`)
-      })
-    });
+    if (payload === MSG.GETSTARTED) {
+      logger.debug(`Get started`);
+      // user第一次按Get Started Button, respond with first message, track session(senderID), etc.
+      //
+      let msg = {
+        text: '歡迎使用StockWiz. 如果你是XQ用戶的話, 請按底下的登入按鈕.'
+      };
+
+      reply(msg, (err) => {
+        if (err) throw err;
+      });
+    }
+    else {
+      // TODO
+      let msg = { text: 'Postback received'};
+
+      actions.setTyping(true);
+      reply(msg, (err)=> {
+        actions.setTyping(false);
+        if (err) throw err;
+      });
+    }
   }
 
   getAPIRouter() {
     let router = express.Router();
 
-    // TODO: add router
-    // router.get('/some', (req, res)=> { this.apiAppSome(req, res)});
-    //
+    router.get('/set_greeting', (req, res)=> { this.apiSetGreeting(req, res); });
+    router.get('/set_getstartedbutton', (req, res)=> { this.apiSetGetStartedButton(req, res); });
+
     return router;
+  }
+
+  apiSetGreeting(req, res) {
+    /* https://developers.facebook.com/docs/messenger-platform/thread-settings/greeting-text */
+    request({
+      method: 'POST',
+      uri: 'https://graph.facebook.com/v2.6/me/thread_settings',
+      qs: { 'access_token': this.PAGE_ACCESS_TOKEN },
+      json: {
+        "setting_type":"greeting",
+        "greeting":{
+          "text": "{{user_full_name}} 你好，歡迎使用StockWiz。 請按底下的開始按鈕."
+        }
+      }
+    })
+    .then(body => {
+      if (body.error) throw body.error;
+      res.json(body);
+    })
+    .catch(err => {
+      this.handleAPIError(req, res, err);
+    })
+  }
+
+  apiSetGetStartedButton(req, res) {
+    /* https://developers.facebook.com/docs/messenger-platform/thread-settings/get-started-button */
+
+    let payload = [{
+      'payload': MSG.GETSTARTED
+    }];
+
+    this.bot.setGetStartedButton(payload, (err, body) => {
+      if (err) {
+        this.handleAPIError(req, res, err);
+      }
+      else {
+        res.json(body);
+      }
+    });
+  }
+
+  handleAPIError(req, res, err) {
+    logger.error('Error request[' + req.url + '] Err=[' + JSON.stringify(err) + ']');
+    res.status(500).send('Error occurred:' + JSON.stringify(err));
   }
 
   getBotRouter(bot) {
@@ -89,7 +166,15 @@ class App {
     if (!this.APP_SECRET || !this.VALIDATION_TOKEN || !this.PAGE_ACCESS_TOKEN || !this.SERVER_URL)
       throw "Missing config values";
 
-    this.bot = this.createBot();
+    this.bot = new Bot({
+      token: this.PAGE_ACCESS_TOKEN,
+      verify: this.VALIDATION_TOKEN,
+      app_secret: this.APP_SECRET
+    });
+
+    this.bot.on('error', (err) => { this.botError(err); });
+    this.bot.on('message', (event, reply, actions) => { this.botMessage(event, reply, actions); });
+    this.bot.on('postback', (event, reply, actions) => { this.botPostback(event, reply, actions); });
 
     let app = express();
     app.set('view engine', 'ejs');
@@ -103,24 +188,22 @@ class App {
     // default error handler
     //
     app.use((err, req, res, next) => {
-        logger.error('Error request[' + req.url + '] Err=[' + err.toString() + ']');
-        res.status(500).send('Error occurred:' + err.toString());
+      logger.error('Error request[' + req.url + '] Err=[' + err.toString() + ']');
+      res.status(500).send('Error occurred:' + err.toString());
     });
 
     app.listen(port);
   }
-
-
 }
 
 let app = new App();
 let port = process.env.PORT || 5000;
 try {
   app.start(port);
-  console.log('Bot started at port:' + port);
+  logger.info('Bot started at port:' + port);
 }
 catch(exception) {
-  console.log('Exception:' + exception);
+  logger.error('Exception:' + exception);
   process.exit(1);
 }
 

@@ -10,6 +10,7 @@
     - 在App Review for Messenger內勾選 pages_messaging 選項, [操作畫面](https://cloud.githubusercontent.com/assets/522142/23288414/73327330-fa7e-11e6-8888-4dd12a4f0a1e.png)
 
 - 設定Bot
+    - git tag: 1_basic_setup
     - config/default.json: 輸入appSecret, pageAccessToken, 任意一個validationToken
     - 安裝ngrok from [https://ngrok.com/](https://ngrok.com/), 我們需要一個可以對外的https的節點, 在開發階段可以使用ngrok來當這個gateway
     - 啟動ngrok, port傳入local web server的port一致
@@ -29,4 +30,17 @@
         - 設定validationToken: 這是一個任意的字串, 可是必須跟default.json內的一模一樣
     - 把webhook跟page連結在一起, [操作畫面](https://cloud.githubusercontent.com/assets/522142/23288415/73375670-fa7e-11e6-8b11-5997368c20de.png)
 - 修改粉絲專頁, 在首頁新增傳送訊息按鈕, 就可以開始測試了, [操作畫面](https://cloud.githubusercontent.com/assets/522142/23288481/cef19ed0-fa7e-11e6-91f4-14a40a33fd88.png), alternatively也可以使用手機測試
+
+## 功能
+
+### 設定Greeting Text, 以及 GetStartedButton
+
+- [設定後畫面](https://cloud.githubusercontent.com/assets/522142/23295219/4e97d980-faaa-11e6-8ceb-b8612088d035.png)
+- 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/thread-settings/greeting-text
+    - https://developers.facebook.com/docs/messenger-platform/thread-settings/get-started-button
+- 設定greeting text的code放在 /api/set_greetingtext 內
+- 設定get started button的code放在 /api/set_getstartedbutton 內
+- 使用者按了Get started之後會產生一個postback, 此時可以開始進行對談
+
 
