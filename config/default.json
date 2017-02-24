@@ -1,0 +1,6 @@
+{
+    "appSecret": "0fc4ed8faab550e4a027bf0cb8b161c3",
+    "pageAccessToken": "EAAOXvaTDcnYBAHzb65MV6AjjJZCa2ccA6d1KyCDNtvNZCXyJdFwWNgorZAaYlxHQqnlYrYRhAGXdEO0E5RwnbFmx1ZAmxHlM7j5BeWFQ6m1eA2mb88zyOse0fIUvPpY8jr5ivOvirQksvjzZBM7micFyvRoh9aDctex7xkijG1wZDZD",
+    "validationToken": "any-string-that-you-like",
+    "serverURL": "https://54a06792.ngrok.io/webhook"
+}

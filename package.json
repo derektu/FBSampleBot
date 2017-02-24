@@ -1,0 +1,19 @@
+{
+  "name": "fbsamplebot",
+  "version": "0.0.1",
+  "description": "facebook bot sample",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "npm test"
+  },
+  "author": "derektu123@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "config": "^1.25.1",
+    "express": "^4.14.1",
+    "messenger-bot": "^2.4.0",
+    "morgan": "^1.8.1"
+  }
+}
