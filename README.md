@@ -35,12 +35,43 @@
 
 ### 設定Greeting Text, 以及 GetStartedButton
 
-- [設定後畫面](https://cloud.githubusercontent.com/assets/522142/23295219/4e97d980-faaa-11e6-8ceb-b8612088d035.png)
 - 請參考以下文件
     - https://developers.facebook.com/docs/messenger-platform/thread-settings/greeting-text
     - https://developers.facebook.com/docs/messenger-platform/thread-settings/get-started-button
+- [設定後畫面](https://cloud.githubusercontent.com/assets/522142/23295219/4e97d980-faaa-11e6-8ceb-b8612088d035.png)
 - 設定greeting text的code放在 /api/set_greetingtext 內
 - 設定get started button的code放在 /api/set_getstartedbutton 內
 - 使用者按了Get started之後會產生一個postback, 此時可以開始進行對談
+
+### XQ帳號連結
+
+- 使用Button template來提示使用者, 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/send-api-reference/button-template
+- Button內使用webview來串連XQ帳號登入畫面
+- webview內可以運用messenger extension來跟messenger做溝通, 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/messenger-extension
+- 程式碼放在 send_LinkAccount內, 以及views/login.ejs內的javascript
+
+### 設定Persistent menu
+
+- 在輸入框旁邊放置一個按鈕, 擺置常用的功能, 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/thread-settings/persistent-menu
+- 設定persistent menu的code放在 /api/set_persistentmenu內
+- [設定後畫面](https://cloud.githubusercontent.com/assets/522142/23386746/4b00e9d8-fd93-11e6-87a3-9ba4474422db.png)
+- [開啟menu畫面](https://cloud.githubusercontent.com/assets/522142/23386749/4c5daa82-fd93-11e6-81c2-da23493a3521.PNG)
+
+### 對話功能(QuickReply)
+
+- 可以在訊息之後夾帶多個按鈕, 讓使用者可以快速挑選(不同於button template), 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/send-api-reference/quick-replies
+- 請參考 send_QueryStock 內的程式碼
+- [QuickReply畫面](https://cloud.githubusercontent.com/assets/522142/23387122/8a097012-fd95-11e6-97e6-91024e1f6bf3.PNG)
+
+### 對話功能(GenericTemplate)
+
+- 可以傳送carousel式的訊息, 內含多個訊息, 每個訊息內可以有圖片, 文字, 按鈕等功能, 適合傳送新聞/報價類的資料, 請參考以下文件
+    - https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template
+- 請參考 apiSendNews 內的程式碼, 注意Bot端需要紀錄使用者的psid, 使用這個id來主動push訊息
+- [新聞畫面](https://cloud.githubusercontent.com/assets/522142/23387123/8b4cdd60-fd95-11e6-9784-f3bd42a11ebc.PNG)
 
 

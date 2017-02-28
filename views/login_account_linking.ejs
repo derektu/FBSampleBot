@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>Login XQ畫面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      div { margin: 10px 0px 10px 0px; }
+    </style>
+  </head>
+  <body>
+
+    <h1>登入XQ帳號測試畫面</h1>
+
+    <div>
+      這個user的連結code: <%=authCode%>
+    </div>
+
+    <p>
+      This should be a login page. 使用者認證成功時, 我們知道這一次login的authCode, 這個user的實際XQ帳號, 另外會收到accountLinked event, 裡面會有使用者的PSID跟authCode, 這樣子就可以串起來了.
+    </p>
+
+    <div>
+      <a href="<%=redirectURISuccess%>">登入成功</a>
+    </div>
+
+    <div>
+      <a href="<%=redirectURI%>">登入失敗</a>
+    </div>
+
+  </body>
+</html>

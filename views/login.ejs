@@ -1,0 +1,138 @@
+<html>
+  <head>
+    <title>登入XQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Roboto:300);
+      .login-page {
+        width: 100%;
+        padding: 8% 0 0;
+        margin: auto;
+      }
+      .form {
+        position: relative;
+        z-index: 1;
+        background: #FFFFFF;
+        max-width: 360px;
+        margin: 0 auto 100px;
+        padding: 5%;
+        text-align: center;
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+      }
+      .form input {
+        font-family: "Roboto", sans-serif;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        margin: 0 0 15px;
+        padding: 15px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+      .form button {
+        font-family: "Roboto", sans-serif;
+        text-transform: uppercase;
+        outline: 0;
+        background: #4CAF50;
+        width: 100%;
+        border: 0;
+        padding: 15px;
+        color: #FFFFFF;
+        font-size: 14px;
+        -webkit-transition: all 0.3 ease;
+        transition: all 0.3 ease;
+        cursor: pointer;
+      }
+      .form button:hover,.form button:active,.form button:focus {
+        background: #43A047;
+      }
+      .form #logo {
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 24pt;
+      }
+      body {
+        background: #76b852; /* fallback for old browsers */
+        background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+        background: -moz-linear-gradient(right, #76b852, #8DC26F);
+        background: -o-linear-gradient(right, #76b852, #8DC26F);
+        background: linear-gradient(to left, #76b852, #8DC26F);
+        font-family: "Roboto", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script>
+      // load Messenger extension sdk
+      //
+      (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'Messenger'));
+    </script>
+    <script language="javascript">
+      $(document).ready(function() {
+        var psid = '<%=psid%>' ;
+        var isWithinMessenger = false;
+        var closeBrowser = function() {
+          if (isWithinMessenger) {
+            MessengerExtensions.requestCloseBrowser();
+          }
+          else {
+
+          }
+        }
+
+        $("#login").click(function() {
+          // 可能的流程
+          // - call server to verify XQ ID/Password
+          // - call /api/linkaccount?psid=..&xqid=..
+          // - close DB
+          //
+          var username = $("#username").val();
+          var password = $("#password").val();
+          var data = {
+            psid: psid,
+            xqid: username
+          };
+          $.ajax({
+              url: '/api/linkaccount',
+              type: 'POST',
+              data: JSON.stringify(data),
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+              success: function(data) {
+                closeBrowser();
+              },
+              error: function(xhr, status, error) {
+                alert(error);
+              }
+          });
+        });
+
+        window.extAsyncInit = function() {
+          // the Messenger Extensions JS SDK is done loading
+          //
+          isWithinMessenger = MessengerExtensions.isInExtension();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="login-page">
+      <div class="form">
+        <form class="login-form" onsubmit="event.preventDefault(); return false;">
+          <div id="logo">請登入ＸＱ</div>
+          <input type="text" id="username" placeholder="username"/>
+          <input type="password" id="password" placeholder="password"/>
+          <button id="login">login</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

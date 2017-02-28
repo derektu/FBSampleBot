@@ -1,9 +1,6 @@
+.idea/
 .DS_Store
 node_modules/
 public/bower_components/
 npm-debug.log
 screens/
-# WebStorm file
-#
-workspace.xml
-codeStyleSettings.xml
